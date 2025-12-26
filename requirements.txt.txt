@@ -1,0 +1,8 @@
+streamlit
+librosa
+scikit-learn
+joblib
+numpy
+scipy
+pillow
+python-dotenv

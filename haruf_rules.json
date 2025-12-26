@@ -1,0 +1,219 @@
+{
+  "ا": {
+    "name": "Alif",
+    "makhraj": "Jauf (mund ki khali jagah)",
+    "type": "madd",
+    "rules": ["Awaaz ko khainch kar parhna"],
+    "mistakes": ["Awaaz bohat zyada lambi", "Awaaz bohat chhoti"],
+    "feedback": {
+      "correct": "✅ مد کے ساتھ درست الف",
+      "too_long": "❌ آواز زیادہ لمبی ہو گئی",
+      "too_short": "❌ آواز بہت چھوٹی ہے"
+    }
+  },
+
+  "ب": {
+    "name": "Baa",
+    "makhraj": "Shafwiya (dono hont)",
+    "type": "light",
+    "rules": ["Dono hont band hona zaroori"],
+    "mistakes": ["Hont band nahi hue", "P ban gaya"],
+    "feedback": {
+      "correct": "✅ ہونٹ مکمل بند تھے — درست ب",
+      "open_lips": "❌ ہونٹ بند نہیں ہوئے",
+      "weak": "❌ آواز کمزور ہے"
+    }
+  },
+
+  "ت": {
+    "name": "Taa",
+    "makhraj": "Lisaniya (zaban + upper daant)",
+    "type": "light",
+    "rules": ["Zaban upar ke daanton ko lagay"],
+    "mistakes": ["ٹ ban gaya"],
+    "feedback": {
+      "correct": "✅ ت صاف ادا ہوا",
+      "hard": "❌ یہ ٹ جیسی آواز ہے"
+    }
+  },
+
+  "ث": {
+    "name": "Saa",
+    "makhraj": "Zaban ka sira + upper daant",
+    "type": "light",
+    "rules": ["Zaban halki bahar niklay"],
+    "mistakes": ["س بن gaya"],
+    "feedback": {
+      "correct": "✅ ث درست ادا ہوا",
+      "wrong": "❌ یہ س بن گیا"
+    }
+  },
+
+  "ج": {
+    "name": "Jeem",
+    "makhraj": "Zaban ka darmiyani hissa",
+    "type": "light",
+    "rules": ["Awaz me halki jharak"],
+    "mistakes": ["چ ban gaya"],
+    "feedback": {
+      "correct": "✅ ج درست ادا ہوا",
+      "wrong": "❌ یہ چ بن گیا"
+    }
+  },
+
+  "ح": {
+    "name": "Haa",
+    "makhraj": "Darmiyani gala",
+    "type": "light",
+    "rules": ["Saans ke sath awaaz"],
+    "mistakes": ["ہ ban gaya"],
+    "feedback": {
+      "correct": "✅ ح حلق سے صاف نکلا",
+      "wrong": "❌ یہ ہ بن گیا"
+    }
+  },
+
+  "خ": {
+    "name": "Khaa",
+    "makhraj": "Upper throat",
+    "type": "heavy",
+    "rules": ["Bhari hawa ke sath"],
+    "mistakes": ["ک ban gaya"],
+    "feedback": {
+      "correct": "✅ خ بھاری اور درست",
+      "wrong": "❌ خ کو ک نہ بنائیں"
+    }
+  },
+
+  "د": {
+    "name": "Daal",
+    "makhraj": "Zaban + upper gums",
+    "type": "light",
+    "rules": ["Narmi ke sath"],
+    "mistakes": ["ڈ ban gaya"],
+    "feedback": {
+      "correct": "✅ د درست ادا ہوا",
+      "wrong": "❌ یہ ڈ بن گیا"
+    }
+  },
+
+  "ر": {
+    "name": "Raa",
+    "makhraj": "Zaban ka sira halka vibrate",
+    "type": "light",
+    "rules": ["Qurani raa"],
+    "mistakes": ["Urdu wala ر"],
+    "feedback": {
+      "correct": "✅ ر قرآنی انداز میں ہے",
+      "wrong": "❌ یہ اردو والا ر ہے"
+    }
+  },
+
+  "س": {
+    "name": "Seen",
+    "makhraj": "Zaban ka kinara",
+    "type": "light",
+    "rules": ["Hawa tez niklay"],
+    "mistakes": ["ش ban gaya"],
+    "feedback": {
+      "correct": "✅ س کی ہوا درست",
+      "wrong": "❌ یہ ش بن گیا"
+    }
+  },
+
+  "ش": {
+    "name": "Sheen",
+    "makhraj": "Zaban upar uthti hai",
+    "type": "light",
+    "rules": ["Hawa phail jaye"],
+    "mistakes": ["س ban gaya"],
+    "feedback": {
+      "correct": "✅ ش درست ادا ہوا",
+      "wrong": "❌ یہ س بن گیا"
+    }
+  },
+
+  "ص": {
+    "name": "Swad",
+    "makhraj": "Zaban ka agla hissa",
+    "type": "heavy",
+    "rules": ["Bhari awaaz"],
+    "mistakes": ["س ban gaya"],
+    "feedback": {
+      "correct": "✅ ص بھاری اور درست",
+      "wrong": "❌ ص کو س نہ بنائیں"
+    }
+  },
+
+  "ق": {
+    "name": "Qaaf",
+    "makhraj": "Zaban ki jarr (root)",
+    "type": "heavy",
+    "rules": ["Gehri awaaz"],
+    "mistakes": ["ک ban gaya"],
+    "feedback": {
+      "correct": "✅ ق بھاری اور گہری ہے",
+      "wrong": "❌ ق کو ک نہ بنائیں"
+    }
+  },
+
+  "ك": {
+    "name": "Kaaf",
+    "makhraj": "Zaban ki jarr",
+    "type": "light",
+    "rules": ["Halka sound"],
+    "mistakes": ["ق ban gaya"],
+    "feedback": {
+      "correct": "✅ ک درست اور ہلکا ہے",
+      "wrong": "❌ یہ ق بنتا جا رہا ہے"
+    }
+  },
+
+  "م": {
+    "name": "Meem",
+    "makhraj": "Dono hont + naak",
+    "type": "light",
+    "rules": ["Ghunnah ke sath"],
+    "mistakes": ["Naak ki hawa nahi"],
+    "feedback": {
+      "correct": "✅ میم میں غنہ درست ہے",
+      "wrong": "❌ ناک کی ہوا شامل نہیں"
+    }
+  },
+
+  "ن": {
+    "name": "Noon",
+    "makhraj": "Zaban + naak",
+    "type": "light",
+    "rules": ["Ghunnah zaroori"],
+    "mistakes": ["Ghunnah khatam"],
+    "feedback": {
+      "correct": "✅ نون میں غنہ درست ہے",
+      "wrong": "❌ نون کا غنہ ختم ہو گیا"
+    }
+  },
+
+  "و": {
+    "name": "Wow",
+    "makhraj": "Hont gol",
+    "type": "madd",
+    "rules": ["Gol hont + lambi awaaz"],
+    "mistakes": ["Short sound"],
+    "feedback": {
+      "correct": "✅ واو کی مد درست ہے",
+      "wrong": "❌ واو کی آواز چھوٹی ہے"
+    }
+  },
+
+  "ي": {
+    "name": "Yaa",
+    "makhraj": "Zaban + jauf",
+    "type": "madd",
+    "rules": ["Narmi se lambi awaaz"],
+    "mistakes": ["Toti hui awaaz"],
+    "feedback": {
+      "correct": "✅ یا کی مد درست ہے",
+      "wrong": "❌ یا ٹوٹی ہوئی ہے"
+    }
+  }
+}
