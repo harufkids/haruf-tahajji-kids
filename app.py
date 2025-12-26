@@ -168,7 +168,7 @@ def make_letter_image(letter_key, big=False):
 # -----------------------
 st.set_page_config(page_title="Haruf-e-Tahajji for Kids", layout="wide")
 st.title("Haruf-e-Tahajji — Kids Trainer (Full Letters)")
-st.markdown(".کے زریعے سے بنائی گئ ہے غلطی ممکن ہے -Ai- یہ ایپ — Made with ❤️ — Haruf-e-Tahajji Kids Trainer.")
+st.markdown("This app predict alphabet by frequency so sometimes it can be mistake— Made with ❤️ — Haruf-e-Tahajji Kids Trainer.")
 
 if 'admin_logged_in' not in st.session_state:
     st.session_state.admin_logged_in = False
