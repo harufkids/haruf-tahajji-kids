@@ -1,8 +1,9 @@
-streamlit
+sounddevice
+scipy
 librosa
+numpy
 scikit-learn
 joblib
-numpy
-scipy
-pillow
+Pillow
 python-dotenv
+
