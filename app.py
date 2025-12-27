@@ -201,23 +201,6 @@ if 'admin_logged_in' not in st.session_state:
     st.session_state.admin_logged_in = False
 
 mode = st.sidebar.radio("Mode", ["Home","Parents","Practice","Admin","Train","Manage/Export"])
-
-if mode == "Parent":
-    st.header("👨‍👩‍👧 Parent Support")
-
-    st.markdown("""
-    This app is **ad-free for children**.
-
-    Your support helps us:
-    - Improve AI pronunciation
-    - Add Islamic learning content
-    - Keep app safe for kids
-    """)
-
-    show_pricing()
-    show_payment_methods()
-    unlock_premium_ui()
-
 if mode in ["Admin","Train","Manage/Export"] and not st.session_state.admin_logged_in:
     pwd = st.sidebar.text_input("Enter Admin Password", type="password")
     if st.sidebar.button("Login"):
@@ -273,6 +256,22 @@ if mode == "Home":
 
 
 # -----------------------
+if mode == "Parents":
+    st.header("👨‍👩‍👧 Parent Support")
+
+    st.markdown("""
+    This app is **ad-free for children**.
+
+    Your support helps us:
+    - Improve AI pronunciation
+    - Add Islamic learning content
+    - Keep app safe for kids
+    """)
+
+    show_pricing()
+    show_payment_methods()
+    unlock_premium_ui()
+
 # Admin
 # -----------------------
 elif mode=="Admin":
