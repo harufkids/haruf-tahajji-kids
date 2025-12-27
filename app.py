@@ -430,77 +430,55 @@ elif mode == "Practice":
         st.stop()
 
     # Load model
-    try:
-        clf = joblib.load(MODEL_PATH)
-    except Exception as e:
-        st.error(f"Load error: {e}")
-        st.stop()
+    if not os.path.exists(MODEL_PATH):
+        st.warning("ماڈل موجود نہیں — پہلے Train کریں")
+    else:
+        try: clf=joblib.load(MODEL_PATH)
+        except Exception as e: st.error(f"Load error: {e}"); st.stop()
+        BASE_DURATION=2.0
+        st.markdown("### 🎤 بڑا بٹن دبائیں اور حرف پڑھیں")
 
-    BASE_DURATION = 2.0
-    st.markdown("### 🎤 بڑا بٹن دبائیں اور حرف پڑھیں")
+        if st.button("🎤 Record & Check"):
+            try:
+                fs,a=record_audio(duration=BASE_DURATION,fs=22050)
+                new_duration=adaptive_duration(a,base=BASE_DURATION)
+                if new_duration>BASE_DURATION:
+                    st.info("🔁 آواز تھوڑی چھوٹی تھی، دوبارہ سن رہے ہیں")
+                    fs,a=record_audio(duration=new_duration,fs=22050)
+                tmp=f"tmp_{int(time.time())}.wav"
+                save_wav_from_array(tmp,fs,a)
+                st.audio(tmp)
+                feats=extract_mfcc_features_from_array(a,sr=22050)
+                probs=clf.predict_proba([feats])[0]
+                labels=clf.classes_
+                top=np.argmax(probs)
+                top_label=labels[top]
+                conf=float(probs[top])
+                urdu=get_urdu_for_label(top_label)
 
-    if st.button("🎤 Record & Check"):
-        try:
-            # 🎙 Record
-            fs, a = record_audio(duration=BASE_DURATION, fs=22050)
+                if conf>=0.8: teacher_msg=urdu
+                elif conf>=0.6: teacher_msg="کوشش اچھی ہے — تھوڑی سی درستگی درکار ہے۔"
+                elif conf>=0.4: teacher_msg="غلط مخارج — دوبارہ آہستہ پڑھیں۔"
+                else: teacher_msg="آواز واضح نہیں تھی — دوبارہ کوشش کریں۔"
 
-            # 🔁 Adaptive retry
-            new_duration = adaptive_duration(a, base=BASE_DURATION)
-            if new_duration > BASE_DURATION:
-                st.info("🔁 آواز تھوڑی چھوٹی تھی، دوبارہ سن رہے ہیں")
-                fs, a = record_audio(duration=new_duration, fs=22050)
+                rule_data=HARUF_RULES.get(top_label,{})
+                letter_type=rule_data.get("type","light")
+                if letter_type=="heavy" and conf<0.75:
+                    teacher_msg="❌ یہ حرف بھاری ہے، زور کے ساتھ پڑھیں۔"
+                elif letter_type=="light" and conf<0.75:
+                    teacher_msg="❌ یہ حرف ہلکا ہے، زور نہ دیں۔"
 
-            # Save + play
-            tmp = f"tmp_{int(time.time())}.wav"
-            save_wav_from_array(tmp, fs, a)
-            st.audio(tmp)
+                st.success(f"حرف: {top_label} | اعتماد: {conf:.2f}")
+                st.markdown(f"### 🧑‍🏫 استاد کا پیغام:\n**{teacher_msg}**")
 
-            # 🔍 Predict
-            feats = extract_mfcc_features_from_array(a, sr=22050)
-            probs = clf.predict_proba([feats])[0]
-            labels = clf.classes_
-
-            top = np.argmax(probs)
-            top_label = labels[top]
-            conf = float(probs[top])
-
-            urdu = get_urdu_for_label(top_label)
-
-            # 🧑‍🏫 Teacher message
-            if conf >= 0.8:
-                teacher_msg = urdu
-            elif conf >= 0.6:
-                teacher_msg = "کوشش اچھی ہے — تھوڑی سی درستگی درکار ہے۔"
-            elif conf >= 0.4:
-                teacher_msg = "غلط مخارج — دوبارہ آہستہ پڑھیں۔"
-            else:
-                teacher_msg = "آواز واضح نہیں تھی — دوبارہ کوشش کریں۔"
-
-            # ⚖️ Tajweed rule check
-            rule_data = HARUF_RULES.get(top_label, {})
-            letter_type = rule_data.get("type", "light")
-
-            if letter_type == "heavy" and conf < 0.75:
-                teacher_msg = "❌ یہ حرف بھاری ہے، زور کے ساتھ پڑھیں۔"
-            elif letter_type == "light" and conf < 0.75:
-                teacher_msg = "❌ یہ حرف ہلکا ہے، زور نہ دیں۔"
-
-            # ✅ Result display
-            st.success(f"حرف: {top_label} | اعتماد: {conf:.2f}")
-            st.markdown(f"### 🧑‍🏫 استاد کا پیغام:\n**{teacher_msg}**")
-
-            # ⭐ Progress system (THIS WAS IMPORTANT)
-            if conf >= 0.8:
-                progress = load_progress()
-                progress[top_label] = min(3, progress.get(top_label, 0) + 1)
-                save_progress(progress)
-
-                st.balloons()
-                st.markdown("## ⭐ آپ کو ستارہ ملا ⭐")
-
-        except Exception as e:
-            st.error(f"Prediction error: {e}")
-
+                if conf>=0.8:
+                    progress=load_progress()
+                    progress[top_label]=min(3,progress.get(top_label,0)+1)
+                    save_progress(progress)
+                    st.balloons()
+                    st.markdown("## ⭐ آپ کو ستارہ ملا ⭐")
+            except Exception as e:
+                st.error(f"Prediction error: {e}")
 
 # -----------------------
 # Manage / Export
