@@ -191,6 +191,29 @@ def show_payment_methods():
     **{PAY_WHATSAPP}**
     """)
 # -----------------------
+# Premium Unlock UI
+# -----------------------
+def unlock_premium_ui():
+    if "premium" not in st.session_state:
+        st.session_state.premium = False
+
+    st.subheader("🔓 Unlock Premium Access")
+
+    code = st.text_input("Enter Premium Code", type="password")
+
+    if st.button("Unlock Premium"):
+        if not PREMIUM_CODE:
+            st.error("Premium system not configured")
+        elif code == PREMIUM_CODE:
+            st.session_state.premium = True
+            st.success("✅ Premium unlocked successfully")
+        else:
+            st.error("❌ Invalid premium code")
+
+    if st.session_state.premium:
+        st.info("⭐ Premium is active")
+
+# -----------------------
 # Streamlit Layout
 # -----------------------
 st.set_page_config(page_title="Haruf-e-Tahajji for Kids", layout="wide")
@@ -199,6 +222,8 @@ st.markdown("This app predicts the alphabet by frequency, so it can sometimes ma
 
 if 'admin_logged_in' not in st.session_state:
     st.session_state.admin_logged_in = False
+if 'premium' not in st.session_state:
+    st.session_state.premium = False
 
 mode = st.sidebar.radio("Mode", ["Home","Parents","Practice","Admin","Train","Manage/Export"])
 if mode in ["Admin","Train","Manage/Export"] and not st.session_state.admin_logged_in:
@@ -384,6 +409,23 @@ elif mode=="Train":
             save_meta(meta)
 
 # -----------------------
+import sounddevice as sd
+from scipy.io.wavfile import write
+
+def record_audio(duration=2.0, fs=22050):
+    audio = sd.rec(int(duration * fs), samplerate=fs, channels=1, dtype="float32")
+    sd.wait()
+    return fs, audio.flatten()
+
+def save_wav_from_array(path, fs, audio):
+    write(path, fs, audio)
+
+def adaptive_duration(audio, base=2.0):
+    energy = np.mean(np.abs(audio))
+    if energy < 0.01:
+        return base + 1.0
+    return base
+
 # Practice
 # -----------------------
 elif mode == "Practice":
