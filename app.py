@@ -281,7 +281,7 @@ if mode == "Home":
 
 
 # -----------------------
-if mode == "Parents":
+elif mode == "Parents":
     st.header("👨‍👩‍👧 Parent Support")
 
     st.markdown("""
@@ -409,23 +409,6 @@ elif mode=="Train":
             save_meta(meta)
 
 # -----------------------
-import sounddevice as sd
-from scipy.io.wavfile import write
-
-def record_audio(duration=2.0, fs=22050):
-    audio = sd.rec(int(duration * fs), samplerate=fs, channels=1, dtype="float32")
-    sd.wait()
-    return fs, audio.flatten()
-
-def save_wav_from_array(path, fs, audio):
-    write(path, fs, audio)
-
-def adaptive_duration(audio, base=2.0):
-    energy = np.mean(np.abs(audio))
-    if energy < 0.01:
-        return base + 1.0
-    return base
-
 # Practice
 # -----------------------
 elif mode == "Practice":
