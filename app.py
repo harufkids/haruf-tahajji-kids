@@ -190,20 +190,6 @@ def show_payment_methods():
     📸 After payment, send screenshot on WhatsApp:
     **{PAY_WHATSAPP}**
     """)
-def unlock_premium_ui():
-    st.subheader("🔓 Unlock Premium")
-
-    code = st.text_input("Enter Unlock Code", type="password")
-
-    if st.button("Unlock"):
-        if not PREMIUM_CODE:
-            st.error("Premium system not configured")
-        elif user_code == PREMIUM_CODE:
-            st.session_state.premium = True
-            st.success("✅ Premium Access Unlocked")
-        else:
-            st.error("❌ Invalid code")
-
 # -----------------------
 # Streamlit Layout
 # -----------------------
@@ -216,7 +202,7 @@ if 'admin_logged_in' not in st.session_state:
 
 mode = st.sidebar.radio("Mode", ["Home","Parents","Practice","Admin","Train","Manage/Export"])
 
-if mode == "Parent Support":
+if mode == "Parent":
     st.header("👨‍👩‍👧 Parent Support")
 
     st.markdown("""
@@ -406,12 +392,6 @@ elif mode == "Practice":
         st.warning("🔒 Practice Mode is for Parent Supporters only")
         st.info("Please unlock from **Parent Support** section")
         st.stop()
-
-    # 👇 your existing Practice code continues below
-elif mode=="Practice":
-    st.header("Practice — Record & Check")
-    if not os.path.exists(MODEL_PATH):
-        st.warning("ماڈل موجود نہیں — پہلے Train کریں")
     else:
         try: clf=joblib.load(MODEL_PATH)
         except Exception as e: st.error(f"Load error: {e}"); st.stop()
