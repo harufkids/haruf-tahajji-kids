@@ -34,17 +34,10 @@ MODEL_PATH = "haruf_model.joblib"
 META_PATH = "meta.json"
 PROGRESS_PATH = "progress.json"
 ADMIN_PASSWORD = os.getenv("MY_APP_PASSWORD")
-JAZZCASH = os.getenv("JAZZCASH_NUMBER")
-EASYPAISA = os.getenv("EASYPAISA_NUMBER")
-
-st.markdown(f"""
-### 💳 Payment Methods (Parents)
-**JazzCash:** {JAZZCASH}  
-**EasyPaisa:** {EASYPAISA}
-
-📸 After payment, send screenshot to WhatsApp
-""")
- 
+PAY_JAZZCASH = os.getenv("JAZZCASH_NUMBER", "Not set")
+PAY_EASYPAISA = os.getenv("EASYPAISA_NUMBER", "Not set")
+PAY_WHATSAPP = os.getenv("WHATSAPP_NUMBER", "Not set")
+PREMIUM_CODE = os.getenv("PREMIUM_CODE")
 
 LETTER_KEYS = [
     "alif","baa","taa","thaa","jeem","haa","kha","dal","dhal","ra","zay",
@@ -172,6 +165,44 @@ def make_letter_image(letter_key, big=False):
     h = bbox[3]-bbox[1]
     draw.text(((W-w)/2,(H-h)/2), glyph, font=fnt, fill=(20,20,20))
     return img
+# ======================
+# STEP 4: Pricing Info
+# ======================
+
+def show_pricing():
+    st.subheader("💰 Pricing")
+    st.markdown("""
+    **One-time Lifetime Access**
+
+    🔓 Unlock Practice Mode  
+    ⭐ Save child progress  
+    🧑‍🏫 AI pronunciation feedback  
+
+    **Price:** PKR 500 (One-time)
+    """)
+def show_payment_methods():
+    st.subheader("💳 Payment Methods")
+
+    st.markdown(f"""
+    **JazzCash:** {PAY_JAZZCASH}  
+    **EasyPaisa:** {PAY_EASYPAISA}
+
+    📸 After payment, send screenshot on WhatsApp:
+    **{PAY_WHATSAPP}**
+    """)
+def unlock_premium_ui():
+    st.subheader("🔓 Unlock Premium")
+
+    code = st.text_input("Enter Unlock Code", type="password")
+
+    if st.button("Unlock"):
+        if not PREMIUM_CODE:
+            st.error("Premium system not configured")
+        elif user_code == PREMIUM_CODE:
+            st.session_state.premium = True
+            st.success("✅ Premium Access Unlocked")
+        else:
+            st.error("❌ Invalid code")
 
 # -----------------------
 # Streamlit Layout
@@ -183,7 +214,23 @@ st.markdown("This app predicts the alphabet by frequency, so it can sometimes ma
 if 'admin_logged_in' not in st.session_state:
     st.session_state.admin_logged_in = False
 
-mode = st.sidebar.radio("Mode", ["Home","Practice","Admin","Train","Manage/Export"])
+mode = st.sidebar.radio("Mode", ["Home","Parents","Practice","Admin","Train","Manage/Export"])
+
+if mode == "Parent Support":
+    st.header("👨‍👩‍👧 Parent Support")
+
+    st.markdown("""
+    This app is **ad-free for children**.
+
+    Your support helps us:
+    - Improve AI pronunciation
+    - Add Islamic learning content
+    - Keep app safe for kids
+    """)
+
+    show_pricing()
+    show_payment_methods()
+    unlock_premium_ui()
 
 if mode in ["Admin","Train","Manage/Export"] and not st.session_state.admin_logged_in:
     pwd = st.sidebar.text_input("Enter Admin Password", type="password")
@@ -354,6 +401,13 @@ elif mode=="Train":
 # -----------------------
 # Practice
 # -----------------------
+elif mode == "Practice":
+    if not st.session_state.premium:
+        st.warning("🔒 Practice Mode is for Parent Supporters only")
+        st.info("Please unlock from **Parent Support** section")
+        st.stop()
+
+    # 👇 your existing Practice code continues below
 elif mode=="Practice":
     st.header("Practice — Record & Check")
     if not os.path.exists(MODEL_PATH):
