@@ -311,7 +311,7 @@ elif mode=="Admin":
     duration=st.slider("Duration (seconds)",0.6,2.5,1.2,0.1)
 col1, col2 = st.columns([2,1])
 with col1:
-    audio_bytes = st_audiorec(key="admin_rec")  # browser recording
+    import st_audiorec
     if audio_bytes:
         try:
             import soundfile as sf
