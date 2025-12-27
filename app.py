@@ -310,18 +310,33 @@ elif mode=="Admin":
     labels=[d for d in sorted(os.listdir(DATA_DIR)) if os.path.isdir(os.path.join(DATA_DIR,d))]
     chosen=st.selectbox("Choose letter",labels,index=labels.index("alif") if "alif" in labels else 0)
     duration=st.slider("Duration (seconds)",0.6,2.5,1.2,0.1)
-    col1,col2=st.columns([2,1])
-    with col1:
-        if st.button("Record sample"):
-            fs,a=record_audio(duration=duration,fs=22050)
-            fname=f"{chosen}_{int(time.time())}.wav"
-            p=os.path.join(DATA_DIR,chosen,fname)
-            save_wav_from_array(p,fs,a)
+col1, col2 = st.columns([2,1])
+with col1:
+    audio_bytes = st_audiorec(key="admin_rec")  # browser recording
+    if audio_bytes:
+        try:
+            import soundfile as sf
+            import io
+
+            # Convert bytes to array
+            data, samplerate = sf.read(io.BytesIO(audio_bytes))
+            a = np.array(data, dtype=np.float32)
+
+            # Save to file
+            fname = f"{chosen}_{int(time.time())}.wav"
+            p = os.path.join(DATA_DIR, chosen, fname)
+            sf.write(p, a, samplerate)
+
             st.success(f"Saved: {p}")
             st.audio(p)
-    with col2:
-        cnt=len(glob.glob(os.path.join(DATA_DIR,chosen,"*.wav")))
-        st.write(f"{chosen}: {cnt} samples")
+
+        except Exception as e:
+            st.error(f"Recording error: {e}")
+
+with col2:
+    cnt = len(glob.glob(os.path.join(DATA_DIR, chosen, "*.wav")))
+    st.write(f"{chosen}: {cnt} samples")
+
 
     new_label=st.text_input("New label key","")
     new_label_urdu=st.text_input("Urdu feedback (optional)","")
