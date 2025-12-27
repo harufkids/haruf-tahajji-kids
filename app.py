@@ -18,7 +18,6 @@ import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
 from dotenv import load_dotenv
 load_dotenv()  # This will load environment variables from .env file
-from st_audiorec import st_audiorec
 import soundfile as sf
 import io
 
@@ -444,60 +443,56 @@ elif mode == "Practice":
 
     st.markdown("### 🎤 بڑا بٹن دبائیں اور حرف پڑھیں")
 
-    audio_bytes = st_audiorec()  # browser recording
-    if audio_bytes:
-        try:
-            # Read audio from bytes
-            data, samplerate = sf.read(io.BytesIO(audio_bytes))
-            a = np.array(data, dtype=np.float32)
+from streamlit_webrtc import webrtc_streamer, AudioProcessorBase, WebRtcMode
+import queue
 
-            # Save temporary file for playback
-            tmp = f"tmp_{int(time.time())}.wav"
-            sf.write(tmp, a, samplerate)
-            st.audio(tmp)
+audio_q = queue.Queue()
 
-            # Feature extraction
-            feats = extract_mfcc_features_from_array(a, sr=samplerate)
-            probs = clf.predict_proba([feats])[0]
-            labels = clf.classes_
-            top = np.argmax(probs)
-            top_label = labels[top]
-            conf = float(probs[top])
-            urdu = get_urdu_for_label(top_label)
+class AudioProcessor(AudioProcessorBase):
+    def recv(self, frame):
+        audio = frame.to_ndarray()
+        audio_q.put(audio)
+        return frame
 
-            # 🧑‍🏫 Teacher message
-            if conf >= 0.8:
-                teacher_msg = urdu
-            elif conf >= 0.6:
-                teacher_msg = "کوشش اچھی ہے — تھوڑی سی درستگی درکار ہے۔"
-            elif conf >= 0.4:
-                teacher_msg = "غلط مخارج — دوبارہ آہستہ پڑھیں۔"
-            else:
-                teacher_msg = "آواز واضح نہیں تھی — دوبارہ کوشش کریں۔"
+st.markdown("### 🎤 Press button & read the letter aloud")
 
-            # ⚖️ Tajweed rule check
-            rule_data = HARUF_RULES.get(top_label, {})
-            letter_type = rule_data.get("type", "light")
-            if letter_type == "heavy" and conf < 0.75:
-                teacher_msg = "❌ یہ حرف بھاری ہے، زور کے ساتھ پڑھیں۔"
-            elif letter_type == "light" and conf < 0.75:
-                teacher_msg = "❌ یہ حرف ہلکا ہے، زور نہ دیں۔"
+webrtc_streamer(key="practice_live", mode=WebRtcMode.SENDONLY, audio_processor_factory=AudioProcessor)
 
-            # ✅ Display result
-            st.success(f"حرف: {top_label} | اعتماد: {conf:.2f}")
-            st.markdown(f"### 🧑‍🏫 استاد کا پیغام:\n**{teacher_msg}**")
+if st.button("Stop & Evaluate"):
+    audio_frames = []
+    while not audio_q.empty():
+        audio_frames.append(audio_q.get())
+    
+    if audio_frames:
+        a = np.concatenate(audio_frames).astype(np.float32)
+        feats = extract_mfcc_features_from_array(a)
+        probs = clf.predict_proba([feats])[0]
+        labels = clf.classes_
+        top_idx = np.argmax(probs)
+        top_label = labels[top_idx]
+        conf = float(probs[top_idx])
+        urdu_feedback = get_urdu_for_label(top_label)
 
-            # ⭐ Progress system
-            if conf >= 0.8:
-                progress = load_progress()
-                progress[top_label] = min(3, progress.get(top_label, 0) + 1)
-                save_progress(progress)
-                st.balloons()
-                st.markdown("## ⭐ آپ کو ستارہ ملا ⭐")
+        # Teacher feedback logic
+        if conf >= 0.8:
+            teacher_msg = urdu_feedback
+        elif conf >= 0.6:
+            teacher_msg = "کوشش اچھی ہے — تھوڑی سی درستگی درکار ہے۔"
+        else:
+            teacher_msg = "آواز واضح نہیں تھی — دوبارہ کوشش کریں۔"
 
-        except Exception as e:
-            st.error(f"Prediction error: {e}")
+        st.success(f"حرف: {top_label} | اعتماد: {conf:.2f}")
+        st.markdown(f"### 🧑‍🏫 استاد کا پیغام:\n**{teacher_msg}**")
 
+        # Update progress
+        if conf >= 0.8:
+            progress = load_progress()
+            progress[top_label] = min(3, progress.get(top_label, 0) + 1)
+            save_progress(progress)
+            st.balloons()
+            st.markdown("## ⭐ آپ کو ستارہ ملا ⭐")
+    else:
+        st.warning("کوئی آواز ریکارڈ نہیں ہوئی")
 
 # -----------------------
 # Manage / Export
