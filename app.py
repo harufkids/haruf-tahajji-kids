@@ -18,18 +18,6 @@ import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
 from dotenv import load_dotenv
 load_dotenv()  # This will load environment variables from .env file
-import sounddevice as sd
-from scipy.io.wavfile import write
-
-def record_audio(duration=2.0, fs=22050):
-    st.info(f"Recording for {duration:.1f} seconds…")
-    audio = sd.rec(int(duration * fs), samplerate=fs, channels=1)
-    sd.wait()
-    audio = audio.flatten()
-    return fs, audio
-
-def save_wav_from_array(fname, fs, arr):
-    write(fname, fs, arr)
 
 # -----------------------
 # Load Makhraj & Tajweed Rules
