@@ -34,7 +34,17 @@ MODEL_PATH = "haruf_model.joblib"
 META_PATH = "meta.json"
 PROGRESS_PATH = "progress.json"
 ADMIN_PASSWORD = os.getenv("MY_APP_PASSWORD")
+JAZZCASH = os.getenv("JAZZCASH_NUMBER")
+EASYPAISA = os.getenv("EASYPAISA_NUMBER")
 
+st.markdown(f"""
+### 💳 Payment Methods (Parents)
+**JazzCash:** {JAZZCASH}  
+**EasyPaisa:** {EASYPAISA}
+
+📸 After payment, send screenshot to WhatsApp
+""")
+ 
 
 LETTER_KEYS = [
     "alif","baa","taa","thaa","jeem","haa","kha","dal","dhal","ra","zay",
