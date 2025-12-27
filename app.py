@@ -15,6 +15,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score
 import joblib
 import streamlit as st
+from streamlit_webrtc import webrtc_streamer, WebRtcMode, AudioProcessorBase
+import queue
 from PIL import Image, ImageDraw, ImageFont
 from dotenv import load_dotenv
 load_dotenv()  # This will load environment variables from .env file
@@ -298,57 +300,74 @@ elif mode == "Parents":
     show_payment_methods()
     unlock_premium_ui()
 
+# -----------------------
 # Admin
 # -----------------------
-elif mode=="Admin":
-    st.header("Admin — Letters & Record Samples")
-    st.markdown("Admin: حروف پہلے سے تیار ہیں۔ مزید labels بنا سکتے ہیں یا recording کر سکتے ہیں۔")
+elif mode == "Admin":
+    st.header("🛠 Admin — Record Letter Samples")
+
+    # Ensure folders
     for k in LETTER_KEYS:
-        os.makedirs(os.path.join(DATA_DIR,k),exist_ok=True)
+        os.makedirs(os.path.join(DATA_DIR, k), exist_ok=True)
 
-    labels=[d for d in sorted(os.listdir(DATA_DIR)) if os.path.isdir(os.path.join(DATA_DIR,d))]
-    chosen=st.selectbox("Choose letter",labels,index=labels.index("alif") if "alif" in labels else 0)
-    duration=st.slider("Duration (seconds)",0.6,2.5,1.2,0.1)
-col1, col2 = st.columns([2,1])
-with col1:
-    import st_audiorec
-    if audio_bytes:
-        try:
-            import soundfile as sf
-            import io
+    labels = [d for d in LETTER_KEYS]
+    chosen = st.selectbox("Choose letter", labels)
 
-            # Convert bytes to array
-            data, samplerate = sf.read(io.BytesIO(audio_bytes))
-            a = np.array(data, dtype=np.float32)
+    st.markdown("### 🎤 Live Recording (Browser)")
 
-            # Save to file
-            fname = f"{chosen}_{int(time.time())}.wav"
-            p = os.path.join(DATA_DIR, chosen, fname)
-            sf.write(p, a, samplerate)
+    audio_q = queue.Queue()
 
-            st.success(f"Saved: {p}")
-            st.audio(p)
+    class AdminAudioProcessor(AudioProcessorBase):
+        def recv(self, frame):
+            audio = frame.to_ndarray()
+            audio_q.put(audio)
+            return frame
 
-        except Exception as e:
-            st.error(f"Recording error: {e}")
+    webrtc_streamer(
+        key="admin_recorder",
+        mode=WebRtcMode.SENDONLY,
+        audio_processor_factory=AdminAudioProcessor,
+        media_stream_constraints={"audio": True, "video": False},
+    )
 
-with col2:
+    if st.button("💾 Save Recording"):
+        frames = []
+        while not audio_q.empty():
+            frames.append(audio_q.get())
+
+        if not frames:
+            st.warning("⚠️ No audio recorded")
+        else:
+            audio = np.concatenate(frames).astype(np.float32)
+            save_path = os.path.join(
+                DATA_DIR, chosen, f"{chosen}_{int(time.time())}.wav"
+            )
+            sf.write(save_path, audio, 22050)
+            st.success(f"✅ Saved: {save_path}")
+            st.audio(save_path)
+
+    # Sample count
     cnt = len(glob.glob(os.path.join(DATA_DIR, chosen, "*.wav")))
-    st.write(f"{chosen}: {cnt} samples")
+    st.info(f"📊 {chosen}: {cnt} samples")
 
+    st.markdown("---")
 
-    new_label=st.text_input("New label key","")
-    new_label_urdu=st.text_input("Urdu feedback (optional)","")
+    # Create new label
+    st.subheader("➕ Create New Label")
+    new_label = st.text_input("New label key")
+    new_label_urdu = st.text_input("Urdu feedback (optional)")
+
     if st.button("Create label folder"):
         if new_label.strip():
-            os.makedirs(os.path.join(DATA_DIR,new_label.strip()),exist_ok=True)
-            meta=load_meta()
+            os.makedirs(os.path.join(DATA_DIR, new_label.strip()), exist_ok=True)
+            meta = load_meta()
             if new_label_urdu.strip():
-                meta.setdefault("urdu",{})[new_label.strip()]=new_label_urdu.strip()
+                meta.setdefault("urdu", {})[new_label.strip()] = new_label_urdu.strip()
                 save_meta(meta)
-            st.success("Label created")
+            st.success("✅ Label created")
         else:
-            st.error("Label name required")
+            st.error("❌ Label name required")
+
 # -----------------------
 # Admin: Upload Letter Images
 # -----------------------
