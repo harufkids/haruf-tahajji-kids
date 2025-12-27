@@ -262,9 +262,9 @@ if mode == "Home":
                 # IMAGE
                 img_path = os.path.join(DATA_DIR, "letter_images", f"{key}.png")
                 if os.path.exists(img_path):
-                    st.image(img_path, use_container_width=True)
+                    st.image(make_letter_image(key), use_column_width=True)
                 else:
-                    st.image(make_letter_image(key), use_container_width=True)
+                    st.image(make_letter_image(key), use_column_width=True)
 
                 # PLAY AUDIO
                 audio_path = os.path.join(AUDIO_DIR, f"{key}.wav")
